@@ -25,7 +25,7 @@ def get_version():
 
     fr = open(git, 'r')
     lines = fr.readlines()
-    commit = lines[len(lines) - 1].split(' ')[0]
+    commit = lines[len(lines) - 1].split(' ')[1]
     fr.close()
 
     return '%s.%s-%s-%s' % (VERSION[0], VERSION[1], VERSION[2], commit)
