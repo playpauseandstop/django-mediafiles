@@ -3,8 +3,19 @@ import os, sys
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import permalink
+from django.template import Context, RequestContext
 
-__all__ = ('Path', 'get_media_prefix', 'get_version')
+__all__ = ('Path', 'auto_context', 'get_media_prefix', 'get_version')
+
+def auto_context(request=None, path=None):
+    if request:
+        return RequestContext(request, {'media_prefix': get_media_prefix(),
+                                        'path': path,
+                                        'version': get_version()})
+    else:
+        return Context({'media_prefix': get_media_prefix(),
+                        'path': path,
+                        'version': get_version()})
 
 def get_media_prefix():
     from settings import MEDIAFILES_MEDIA_PREFIX
@@ -67,11 +78,18 @@ class Path(object):
         return ('mediafiles_explorer', (), {'path': self.safe_path.lstrip('/')})
     get_absolute_url = permalink(get_absolute_url)
 
+    def get_mkdir_url(self):
+        return ('mediafiles_mkdir', (), {'path': self.safe_path.lstrip('/')})
+    get_mkdir_url = permalink(get_mkdir_url)
+
     def get_parent_url(self):
         return self.parent.get_absolute_url()
 
     def is_dir(self):
         return os.path.isdir(self.path)
+
+    def is_executeable(self):
+        return os.access(self.path, os.X_OK)
 
     def is_link(self):
         return False
@@ -79,8 +97,14 @@ class Path(object):
     def is_file(self):
         return os.path.isfile(self.path)
 
+    def is_readable(self):
+        return os.access(self.path, os.R_OK)
+
     def is_root(self):
         return self.path == self.__root
+
+    def is_writeable(self):
+        return os.access(self.path, os.W_OK)
 
     def list_dir(self, order=None, desc=None):
         if not self.is_dir():

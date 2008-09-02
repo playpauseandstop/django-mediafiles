@@ -13,5 +13,9 @@ else:
     urlpatterns = patterns('')
 
 urlpatterns += patterns('mediafiles.views',
+    url(r'^mkdir/(?P<path>.*)$', 'mkdir', name='mediafiles_mkdir'),
+    url(r'^properties/(?P<path>.*)$', 'properties',
+        name='mediafiles_properties'),
+    url(r'^remove/(?P<path>.*)$', 'remove', name='mediafiles_remove'),
     url(r'^(?P<path>.*)$', 'explorer', name='mediafiles_explorer'),
 )

@@ -2,7 +2,6 @@
 {% load i18n %}
 
 {% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
-{% block page_title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
 
 {% block breadcrumbs %}{% if path.is_root %}
     {% trans 'Home' %}
@@ -13,10 +12,18 @@
     {% endfor %}
 {% endif %}{% endblock %}
 {% block page_content %}
+<h1>{% if path.is_dir %}{% trans 'Directory' %}{% else %}{% trans 'File' %}{% endif %} {{ path.safe_path }}</h1>
+
+<div id="content-main">
 
     {% if path.is_file %}
     {% else %}
-    <div class="module">
+    <ul class="object-tools">
+        <li><a href="{{ path.get_mkdir_url }}" class="addlink">{% trans 'Mkdir' %}</a></li>
+        <li><a href="{{ path.get_properties_url }}" class="changelink">{% trans 'Properties' %}</a></li>
+        {% if not path.is_root %}<li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>{% endif %}
+    </ul>
+
     <table id="explorer">
         <tr>
             <th class="icon"></th>
@@ -24,12 +31,17 @@
             <th>{% trans 'Size' %}</th>
             <th colspan="5">{% trans 'Actions' %}</th>
         </tr>
-        {% if not path.is_root %}<tr class="row-back" onclick="location.href='{{ path.get_parent_url }}'" title="{% trans 'Back to parent directory' %}">
+        {% if not path.is_root %}
+        <tr class="row2 row-back" title="{% trans 'Back to parent directory' %}"
+            onclick="location.href='{{ path.get_parent_url }}'"
+            onmouseover="this.className=this.className.replace('row2', 'alt')"
+            onmouseout="this.className=this.className.replace('alt', 'row2')">
             <td class="back"></td>
             <td class="path"><a href="{{ path.get_parent_url }}">..</a></td>
-            <td colspan="5"></td>
+            <td colspan="6"></td>
         </tr>{% endif %}
-        {% for f in path.list_dir %}<tr class="row{% cycle 1 2 %}">
+        {% for f in path.list_dir %}
+        <tr class="row{% cycle 1 2 %}" onmouseover="this.className='alt'" onmouseout="this.className='row{% cycle 1 2 %}'">
             <td class="{{ f.get_icon_class }}"></td>
             {% if f.is_dir %}<td class="path path-directory" onclick="location.href='{{ f.get_absolute_url }}'">
                 <a href="{{ f.get_absolute_url }}">{{ f.url }}</a>
@@ -42,7 +54,7 @@
             <td class="chown">Chown</td>
             <td class="delete">Delete</td>
         </tr>{% endfor %}
-    </table>
-    </div>{% endif %}
+    </table>{% endif %}
 
+</div>
 {% endblock %}

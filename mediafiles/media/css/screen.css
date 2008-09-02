@@ -15,12 +15,11 @@ th {
     color: #2b4e5f;
 }
 
-#content {
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-}
-
 #explorer {
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    border-collapse: collapse;
 }
 
 #explorer .icon {
@@ -42,6 +41,14 @@ th {
 
 #footer {
     margin: 0 !important;
-    padding-top: 0;
     font-size: 0.9em;
+}
+
+.object-tools a.deletelink {
+    padding-right: 28px;
+    background: #999 url('../img/tooltag-remove.png') top right no-repeat;
+}
+
+.object-tools a.deletelink:hover {
+    background: #5b80b2 url('../img/tooltag-remove_over.png') top right no-repeat;
 }

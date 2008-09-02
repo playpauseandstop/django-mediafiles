@@ -7,7 +7,6 @@
 
     <meta name="Robots" content="noindex,nofollow" />
 
-    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/admin.css" />
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
     <link rel="stylesheet" type="text/css" href="{{ media_prefix }}css/screen.css" media="screen,projection,tv" />
@@ -19,12 +18,12 @@
 
     <div id="header">{% block header %}
         <div id="branding">
-            <h1 id="site-name">{% trans 'Mediafiles' %}{% block page_title %}{% endblock %}</h1>
+            <h1 id="site-name"><a href="{% url mediafiles_explorer "" %}">{% trans 'Mediafiles' %}</a></h1>
         </div>
     {% endblock %}</div>
 
     <div class="breadcrumbs">{% block breadcrumbs %}{% endblock %}</div>
-    <div id="content">{% block page_content %}{% endblock %}</div>
+    <div id="content" class="flex">{% block page_content %}{% endblock %}</div>
 
     <p id="footer">{% block footer %}
         <a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a> {{ version }}
