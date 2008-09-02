@@ -22,6 +22,9 @@ Basic installation
  1. Add ``mediafiles`` to your project ``INSTALLED_APPS`` and set up serving
  of ``mediafiles`` media directory.
 
+ 1. Add ``(r'^mediafiles/', include('mediafiles.urls'))`` to your project
+ URLConf.
+
  1. That's all :) Now login into Django admin CRUD and click on **Media
  Files** (or localized value) link.
 
