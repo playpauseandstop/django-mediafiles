@@ -1,0 +1,30 @@
+<html>
+{% load adminmedia i18n %}
+<head>
+    <title>{% trans 'Mediafiles' %}{% block title %}{% endblock %}</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta name="Robots" content="noindex,nofollow" />
+
+    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/admin.css" />
+    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+    <link rel="stylesheet" type="text/css" href="{{ media_prefix }}css/screen.css" media="screen,projection,tv" />
+    {% block extra_style %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <div id="header">{% block header %}
+        <div id="branding">
+            <h1 id="site-name"><a href="{% url mediafiles_explorer path="" %}">{% trans 'Mediafiles' %}</a>{% block page_title %}{% endblock %}</h1>
+        </div>
+    {% endblock %}</div>
+    <div id="content">{% block page_content %}{% endblock %}</div>
+    <p id="footer"><a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a> {{ version }}</p>
+
+</body>
+
+</html>

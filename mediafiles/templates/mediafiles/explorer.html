@@ -1,0 +1,40 @@
+{% extends 'mediafiles/base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
+{% block page_title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
+
+{% block page_content %}
+
+    {% if path.is_file %}
+    {% else %}
+    <div class="module">
+    <table id="explorer">
+        <tr>
+            <th class="icon"></th>
+            <th>{% trans 'Path' %}</th>
+            <th>{% trans 'Size' %}</th>
+            <th colspan="5">{% trans 'Actions' %}</th>
+        </tr>
+        {% if not path.is_root %}<tr class="row-back" onclick="location.href='{{ path.get_parent_url }}'" title="{% trans 'Back to parent directory' %}">
+            <td class="back"></td>
+            <td class="path"><a href="{{ path.get_parent_url }}">..</a></td>
+            <td colspan="5"></td>
+        </tr>{% endif %}
+        {% for f in path.list_dir %}<tr class="row{% cycle 1 2 %}">
+            <td class="{{ f.get_icon_class }}"></td>
+            {% if f.is_dir %}<td class="path path-directory" onclick="location.href='{{ f.get_absolute_url }}'">
+                <a href="{{ f.get_absolute_url }}">{{ f.url }}</a>
+            </td>{% else %}
+            <td class="path">{{ f.url }}</td>{% endif %}
+            <td>{{ f.size|filesizeformat }}</td>
+            <td class="show"><a href="{{ MEDIA_URL }}{{ f.media_url }}">Show</a></td>
+            <td class="rename">Rename</td>
+            <td class="chmod">Chmod</td>
+            <td class="chown">Chown</td>
+            <td class="delete">Delete</td>
+        </tr>{% endfor %}
+    </table>
+    </div>{% endif %}
+
+{% endblock %}

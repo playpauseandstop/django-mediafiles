@@ -1,0 +1,43 @@
+@charset 'utf-8';
+
+body, table, td, th {
+    font-family: 'Lucida Sans Unicode', 'Tahoma', 'Verdana', 'Arial', sans-serif;
+}
+
+table {
+    width: 100%;
+}
+
+th {
+    background-color: #c3d7e2;
+    padding-top: 3pt;
+    padding-bottom: 3pt;
+    color: #2b4e5f;
+}
+
+#content {
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+#explorer {
+}
+
+#explorer .icon {
+    width: 2%;
+    min-width: 16px;
+}
+
+#explorer .path {
+    width: 60%;
+}
+
+#explorer .path-directory, #explorer .row-back {
+    cursor: pointer;
+}
+
+#footer {
+    margin: 0 !important;
+    padding-top: 0;
+    font-size: 0.9em;
+}
