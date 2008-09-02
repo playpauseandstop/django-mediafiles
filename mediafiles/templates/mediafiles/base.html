@@ -19,11 +19,16 @@
 
     <div id="header">{% block header %}
         <div id="branding">
-            <h1 id="site-name"><a href="{% url mediafiles_explorer path="" %}">{% trans 'Mediafiles' %}</a>{% block page_title %}{% endblock %}</h1>
+            <h1 id="site-name">{% trans 'Mediafiles' %}{% block page_title %}{% endblock %}</h1>
         </div>
     {% endblock %}</div>
+
+    <div class="breadcrumbs">{% block breadcrumbs %}{% endblock %}</div>
     <div id="content">{% block page_content %}{% endblock %}</div>
-    <p id="footer"><a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a> {{ version }}</p>
+
+    <p id="footer">{% block footer %}
+        <a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a> {{ version }}
+    {% endblock %}</p>
 
 </body>
 

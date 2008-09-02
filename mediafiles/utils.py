@@ -46,16 +46,19 @@ class Path(object):
             self.safe_path += '/'
             self.url += '/'
 
+    def __repr__(self):
+        if self.is_dir():
+            return '<Directory "%s">' % self.path
+        elif self.is_link():
+            return '<Link "%s -> %s">' % (self.path, self.link)
+        else:
+            return '<File "%s">' % self.path
+
     def __str__(self):
         return self.url
 
     def __unicode__(self):
-        if self.isdir():
-            return u'Directory <%s>' % self.path
-        elif self.islink():
-            return u'Link <%s -> %s>' % (self.path, self.link)
-        else:
-            return u'File <%s>' % self.path
+        return u'%s' % self.url
 
     def exists(self):
         return self.is_dir() or self.is_file()
@@ -65,9 +68,7 @@ class Path(object):
     get_absolute_url = permalink(get_absolute_url)
 
     def get_parent_url(self):
-        parent = self.parent or ''
-        return ('mediafiles_explorer', (), {'path': parent})
-    get_parent_url = permalink(get_parent_url)
+        return self.parent.get_absolute_url()
 
     def is_dir(self):
         return os.path.isdir(self.path)
@@ -100,11 +101,34 @@ class Path(object):
     def _get_parent(self):
         if self.is_root():
             return None
+
+        if hasattr(self, '__parent_cache'):
+            return getattr(self, '__parent_cache')
+
         parts = self.safe_path.strip('/').split('/')
         if len(parts) == 1:
-            return ''
-        return '/'.join(parts)
+            parent = Path('', self.__root)
+        else:
+            parent = Path('/'.join(parts[:-1]), self.__root)
+        setattr(self, '__parent_cache', parent)
+        return parent
     parent = property(_get_parent)
+
+    def _get_parts(self):
+        if self.is_root():
+            return []
+
+        if hasattr(self, '__parts_cache'):
+            return getattr(self, '__parts_cache')
+
+        parts = self.safe_path.strip('/').split('/')
+        result = []
+        for i, p in enumerate(parts):
+            p = '/'.join(parts[:i + 1])
+            result.append(Path(p, self.__root))
+        setattr(self, '__parts_cache', result)
+        return result
+    parts = property(_get_parts)
 
     def _get_size(self):
         if self.is_dir():

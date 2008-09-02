@@ -4,6 +4,14 @@
 {% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
 {% block page_title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
 
+{% block breadcrumbs %}{% if path.is_root %}
+    {% trans 'Home' %}
+{% else %}
+    <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a> &rsaquo;
+    {% for p in path.parts %}
+    {% if not forloop.last %}<a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a> &rsaquo; {% else %}{{ p.url|cut:"/" }}{% endif %}
+    {% endfor %}
+{% endif %}{% endblock %}
 {% block page_content %}
 
     {% if path.is_file %}
@@ -28,7 +36,7 @@
             </td>{% else %}
             <td class="path">{{ f.url }}</td>{% endif %}
             <td>{{ f.size|filesizeformat }}</td>
-            <td class="show"><a href="{{ MEDIA_URL }}{{ f.media_url }}">Show</a></td>
+            <td class="show"><a href="{{ MEDIA_URL }}{{ f.media_url }}" onclick="this.target='_blank'">Show</a></td>
             <td class="rename">Rename</td>
             <td class="chmod">Chmod</td>
             <td class="chown">Chown</td>

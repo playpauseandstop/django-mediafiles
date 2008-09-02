@@ -36,6 +36,10 @@ th {
     cursor: pointer;
 }
 
+#explorer .path-directory {
+    font-weight: bold;
+}
+
 #footer {
     margin: 0 !important;
     padding-top: 0;
