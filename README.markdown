@@ -4,18 +4,21 @@ Introduction
 ``django-mediafiles`` is Django reusable application to manage media files in
 your Django project. Now ``django-mediafiles`` supports:
 
- * Directories creating, editing (chmod, chown, rename), deleting
+ * Directories creating +, editing (chmod, chown, rename +), deleting +
  * Files creating, uploading, editing (chmod, chown), deleting
  * Recycle bin
  * Thumbnail creation for images
  * Text files editing in browser
+
+**NOTE**: Possibilities that supported current version of
+``django-mediafiles`` labeled by ** + **.
 
 Basic installation
 ==================
 
  1. Install ``django-mediafiles`` via:
 
-        # python setup.py install
+        # python setup.py install (Not worked yet :( )
 
  or add ``mediafiles`` directory to your ``PYTHONPATH``.
 
@@ -26,9 +29,10 @@ Basic installation
  URLConf.
 
  1. That's all :) Now login into Django admin CRUD and click on **Media
- Files** (or localized value) link.
+ Files** (or localized value) link. (Not worked yet, go to mediafiles url
+ to get access to it)
 
 More
 ====
 
-See ``docs/`` directory for more information about ``django-mediafiles``
+;)
