@@ -55,11 +55,11 @@
             </td>{% else %}
             <td class="path">{{ f.url }}</td>{% endif %}
             <td>{{ f.size|filesizeformat }}</td>
-            <td class="show">{% if f.is_readable %}<a href="{{ MEDIA_URL }}{{ f.media_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Show' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
-            <td class="rename">{% if f.is_writeable %}<a href="{% url mediafiles_rename f.media_url %}">{% else %}<span class="disabled">{% endif %}{% trans 'Rename' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="show">{% if f.is_readable %}<a href="{{ f.get_absolute_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Show' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="rename">{% if f.is_writeable %}<a href="{{ f.get_rename_url }}">{% else %}<span class="disabled">{% endif %}{% trans 'Rename' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
             <td class="chmod"><span class="disabled">{% trans 'Chmod' %}</span></td>
             <td class="chown"><span class="disabled">{% trans 'Chown' %}</span></td>
-            <td class="delete">{% if f.is_writeable %}<a href="{% url mediafiles_remove f.media_url %}">{% else %}<span class="disabled">{% endif %}{% trans 'Delete' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="delete">{% if f.is_writeable %}<a href="{{ f.get_remove_url }}">{% else %}<span class="disabled">{% endif %}{% trans 'Delete' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
         </tr>{% endfor %}
     </table>{% endif %}
 

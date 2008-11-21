@@ -84,6 +84,14 @@ class Path(object):
         return ('mediafiles_mkdir', (), {'path': self.safe_path.lstrip('/')})
     get_mkdir_url = permalink(get_mkdir_url)
 
+    def get_remove_url(self):
+        return ('mediafiles_remove', (), {'path': self.safe_path.lstrip('/')})
+    get_remove_url = permalink(get_remove_url)
+
+    def get_rename_url(self):
+        return ('mediafiles_rename', (), {'path': self.safe_path.lstrip('/')})
+    get_rename_url = permalink(get_rename_url)
+
     def get_parent_url(self):
         return self.parent.get_absolute_url()
 
@@ -168,7 +176,10 @@ class Path(object):
     parts = property(_get_parts)
 
     def remove(self):
-        raise NotImplementedError, 'Not implemented yet.'
+        if self.is_dir():
+            shutil.rmtree(self.path)
+        else:
+            os.remove(self.path)
 
     def rename(self, newname):
         newpath = Path(newname, self.parent.path)
