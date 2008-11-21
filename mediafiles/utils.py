@@ -1,11 +1,12 @@
-import os, sys
+import os, shutil, sys
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import permalink
 from django.template import Context, RequestContext
 
-__all__ = ('Path', 'auto_context', 'get_media_prefix', 'get_version')
+__all__ = ('Path', 'auto_context', 'get_media_prefix', 'get_version',
+           'permval')
 
 def auto_context(request=None, path=None):
     if request:
@@ -50,7 +51,8 @@ class Path(object):
         if not path or path == '/':
             path = ''
         self.path = os.path.join(root, path)
-        self.url = os.path.basename(path)
+        self.url = os.path.basename(self.path.rstrip('/'))
+        self.name = self.url
 
         if self.safe_path != '/' and self.is_dir():
             self.media_url += '/'
@@ -106,21 +108,32 @@ class Path(object):
     def is_writeable(self):
         return os.access(self.path, os.W_OK)
 
-    def list_dir(self, order=None, desc=None):
+    def list_dir(self, filter=None, order=None, desc=None):
         if not self.is_dir():
             raise TypeError, '<%s> is not a valid directory path.' % self.path
+
+        filter = filter or 'all'
+        if filter not in ('all', 'dirs', 'files', 'links'):
+            filter = 'all'
+
         data = os.listdir(self.path)
         dirs, files = [], []
         for i, path in enumerate(data):
             path = os.path.join(self.safe_path, path).lstrip('/')
             path = Path(path, self.__root)
-            if path.is_dir():
+            if path.is_dir() and filter in ('all', 'dirs'):
                 dirs.append(path)
-            else:
+            elif filter not in ('dirs',):
                 files.append(path)
         sort_cmp = lambda x,y: cmp(x.__str__().lower(), y.__str__().lower())
         dirs.sort(sort_cmp), files.sort(sort_cmp)
         return dirs + files
+
+    def mkdir(self, name):
+        path = Path(name, self.path)
+        if not path.exists() and not path.is_dir():
+            os.mkdir(path.path)
+        return path
 
     def _get_parent(self):
         if self.is_root():
@@ -153,6 +166,11 @@ class Path(object):
         setattr(self, '__parts_cache', result)
         return result
     parts = property(_get_parts)
+
+    def rename(self, newname):
+        newpath = Path(newname, self.parent.path)
+        shutil.move(self.path, newpath.path)
+        return newpath
 
     def _get_size(self):
         if self.is_dir():

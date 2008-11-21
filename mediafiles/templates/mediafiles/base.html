@@ -1,5 +1,9 @@
-<html>
+<?xml version="1.0" encoding="utf-8" ?>
 {% load adminmedia i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <title>{% trans 'Mediafiles' %}{% block title %}{% endblock %}</title>
 
@@ -7,6 +11,7 @@
 
     <meta name="Robots" content="noindex,nofollow" />
 
+    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/base.css" />
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />
     <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
     <link rel="stylesheet" type="text/css" href="{{ media_prefix }}css/screen.css" media="screen,projection,tv" />

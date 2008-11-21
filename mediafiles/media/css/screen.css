@@ -22,6 +22,10 @@ th {
     border-collapse: collapse;
 }
 
+#explorer .disabled {
+    color: #ccc;
+}
+
 #explorer .icon {
     width: 2%;
     min-width: 16px;
@@ -42,6 +46,14 @@ th {
 #footer {
     margin: 0 !important;
     font-size: 0.9em;
+}
+
+.form-row input {
+    width: 60%;
+}
+
+.form-row label {
+    width: 15%;
 }
 
 .object-tools a.deletelink {

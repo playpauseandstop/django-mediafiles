@@ -27,10 +27,14 @@ def mkdir(request, path):
     if not path.is_writeable():
         return render_to_response('mediafiles/403.html', context)
 
-    redirect_to = request.REQUEST.get('next', None)
+    add_another = request.REQUEST.get('_addanother', False)
 
-    if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
-        redirect_to = path.get_absolute_url()
+    if add_another:
+        redirect_to = request.path
+    else:
+        redirect_to = request.REQUEST.get('next', None)
+        if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
+            redirect_to = path.get_absolute_url()
 
     if request.method == 'POST':
         form = MakeDirectoryForm(request.POST, path=path)
@@ -49,3 +53,35 @@ def properties(request, path):
 
 def remove(request, path):
     pass
+
+def rename(request, path):
+    context = auto_context(**locals())
+
+    if path.is_root():
+        return HttpResponseRedirect(path.get_absolute_url())
+
+    if not path.exists():
+        return render_to_response('mediafiles/404.html', context)
+
+    if not path.is_writeable():
+        return render_to_response('mediafiles/403.html', context)
+
+    redirect_to = request.REQUEST.get('next', None)
+
+    if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
+        redirect_to = path.parent.get_absolute_url()
+
+    if request.method == 'POST':
+        if not 'oldname' in request.POST:
+            request.POST.update({'oldname': path.name})
+
+        form = RenamePathForm(request.POST, path=path)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = RenamePathForm(initial={'oldname': path.name}, path=path)
+
+    context.update({'form': form})
+    return render_to_response('mediafiles/rename.html', context)
+rename = path_process(rename)

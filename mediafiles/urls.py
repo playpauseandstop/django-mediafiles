@@ -17,5 +17,6 @@ urlpatterns += patterns('mediafiles.views',
     url(r'^properties/(?P<path>.*)$', 'properties',
         name='mediafiles_properties'),
     url(r'^remove/(?P<path>.*)$', 'remove', name='mediafiles_remove'),
+    url(r'^rename/(?P<path>.*)$', 'rename', name='mediafiles_rename'),
     url(r'^(?P<path>.*)$', 'explorer', name='mediafiles_explorer'),
 )

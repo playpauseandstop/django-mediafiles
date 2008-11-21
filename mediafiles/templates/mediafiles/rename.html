@@ -1,12 +1,12 @@
 {% extends 'mediafiles/explorer.html' %}
 {% load i18n %}
-{% block title %}: {% trans 'Make new directory' %} {{ block.super }}{% endblock %}
+{% block title %}: {% if path.is_dir %}{% trans 'Rename directory' %}{% else %}{% trans 'Rename file' %}{% endif %} {{ block.super }}{% endblock %}
 
 {% block page_content %}
-<h1>{% blocktrans with path.safe_path as path %}Make new directory at {{ path }}{% endblocktrans %}</h1>
+<h1>{% blocktrans with path.safe_path as path %}Rename {{ path }}{% endblocktrans %}</h1>
 
 <div id="content-main">
-    <form enctype="multipart/form-data" action="" method="post" id="mkdir_form"><div>
+    <form enctype="multipart/form-data" action="" method="post" id="rename_form"><div>
         <fieldset class="module aligned">{% for f in form %}
             <div class="form-row{% if f.errors %} errors{% endif %} {{ f.name }}">
                 {% if f.errors %}{{ f.errors }}{% endif %}
@@ -20,12 +20,11 @@
     </div>
 
     <div class="submit-row">
-        <input type="submit" value="{% trans 'Make directory' %}" class="default" name="_save" />
-        <input type="submit" value="{% trans 'Make directory and make another' %}" name="_addanother" />
+        <input type="submit" value="{% if path.is_dir %}{% trans 'Rename directory' %}{% else %}{% trans 'Rename file' %}{% endif %}" class="default" name="_save" />
     </div></form>
 
     <script type="text/javascript"><!--
-        document.getElementById('id_name').focus()
+        document.getElementById('id_newname').focus()
     --></script>
 </div>
 {% endblock %}
