@@ -48,12 +48,17 @@ th {
     font-size: 0.9em;
 }
 
-.form-row input {
+.form-row input[type="text"] {
     width: 60%;
 }
 
 .form-row label {
     width: 15%;
+}
+
+.form-row .help {
+    margin-left: 15%;
+    padding-left: 0 !important;
 }
 
 .object-tools a.deletelink {

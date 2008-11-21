@@ -1,0 +1,30 @@
+{% extends 'mediafiles/explorer.html' %}
+{% load i18n %}
+{% block title %}: {% if path.is_dir %}{% trans 'Remove directory' %}{% else %}{% trans 'Remove file' %}{% endif %} {{ block.super }}{% endblock %}
+
+{% block page_content %}
+<h1>{% blocktrans with path.safe_path as path %}Remove {{ path }}{% endblocktrans %}</h1>
+
+<div id="content-main">
+    <form enctype="multipart/form-data" action="" method="post" id="rename_form"><div>
+        <fieldset class="module aligned">{% for f in form %}
+            <div class="form-row{% if f.errors %} errors{% endif %} {{ f.name }}">
+                {% if f.errors %}{{ f.errors }}{% endif %}
+                <div>
+                    <label for="{{ f.auto_id }}"{% if f.field.required %} class="required"{% endif %}>{{ f.label }}:</label>
+                    {{ f }}
+                    {% if f.help_text %}<p class="help">{{ f.help_text }}</p>{% endif %}
+                </div>
+            </div>
+        {% endfor %}</fieldset>
+    </div>
+
+    <div class="submit-row">
+        <input type="submit" value="{% if path.is_dir %}{% trans 'Remove directory' %}{% else %}{% trans 'Remove file' %}{% endif %}" class="default" name="_save" />
+    </div></form>
+
+    <script type="text/javascript"><!--
+        document.getElementById('id_newname').focus()
+    --></script>
+</div>
+{% endblock %}

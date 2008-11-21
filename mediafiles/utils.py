@@ -167,6 +167,9 @@ class Path(object):
         return result
     parts = property(_get_parts)
 
+    def remove(self):
+        raise NotImplementedError, 'Not implemented yet.'
+
     def rename(self, newname):
         newpath = Path(newname, self.parent.path)
         shutil.move(self.path, newpath.path)

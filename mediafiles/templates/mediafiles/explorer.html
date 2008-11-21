@@ -9,9 +9,13 @@
     <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a>
 {% else %}
     <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a> &rsaquo;
-    {% for p in path.parts %}
-    {% if form or not forloop.last %}<a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a>{% if not forloop.last %} &rsaquo; {% endif %}{% else %}{{ p.url|cut:"/" }}{% endif %}
-    {% endfor %}
+    {% for p in path.parts %}{% if not forloop.last %}
+        <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a> &rsaquo;
+    {% else %}{% if p.is_dir and form %}
+        <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a>
+    {% else %}
+        {{ p.url|cut:"/" }}
+    {% endif %}{% endif %}{% endfor %}
 {% endif %}{% endif %}{% endblock breadcrumbs %}
 
 {% block page_content %}
