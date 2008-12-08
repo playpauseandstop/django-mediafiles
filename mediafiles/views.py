@@ -16,15 +16,6 @@ def explorer(request, path):
 explorer = staff_member_required(explorer)
 explorer = path_process(explorer)
 
-def login(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(
-            reverse('mediafiles_explorer', (), {'path': ''})
-        )
-    return auth_views.login(request,
-                            template_name='mediafiles/login.html',
-                            next=request.path)
-
 def logout(request):
     return auth_views.logout(request)
 

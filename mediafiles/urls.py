@@ -14,7 +14,6 @@ else:
     urlpatterns = patterns('')
 
 urlpatterns += patterns('mediafiles.views',
-    url(r'^login/$', 'login', name='mediafiles_login'),
     url(r'^logout/$', 'logout', name='mediafiles_logout'),
     url(r'^mkdir/(?P<path>.*)$', 'mkdir', name='mediafiles_mkdir'),
     url(r'^mkfile/(?P<path>.*)$', 'mkfile', name='mediafiles_mkfile'),
