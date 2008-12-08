@@ -1,7 +1,9 @@
+from django.conf import settings
+
+
 __all__ = ('path_process',)
 
 def path_process(view_func):
-    from django.conf import settings
     from utils import Path
     def _wrapper(request, *args, **kwargs):
         if not kwargs:

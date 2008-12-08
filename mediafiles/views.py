@@ -1,3 +1,5 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import views as auth_views
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
@@ -11,7 +13,20 @@ def explorer(request, path):
     if not path.exists():
         return render_to_response('mediafiles/404.html', context)
     return render_to_response('mediafiles/explorer.html', context)
+explorer = staff_member_required(explorer)
 explorer = path_process(explorer)
+
+def login(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(
+            reverse('mediafiles_explorer', (), {'path': ''})
+        )
+    return auth_views.login(request,
+                            template_name='mediafiles/login.html',
+                            next=request.path)
+
+def logout(request):
+    return auth_views.logout(request)
 
 def mkdir(request, path):
     context = auto_context(**locals())
@@ -40,6 +55,7 @@ def mkdir(request, path):
 
     context.update({'form': form})
     return render_to_response('mediafiles/mkdir.html', context)
+mkdir = staff_member_required(mkdir)
 mkdir = path_process(mkdir)
 
 def mkfile(request, path):
@@ -69,10 +85,8 @@ def mkfile(request, path):
 
     context.update({'form': form})
     return render_to_response('mediafiles/mkfile.html', context)
+mkfile = staff_member_required(mkfile)
 mkfile = path_process(mkfile)
-
-def properties(request, path):
-    pass
 
 def remove(request, path):
     context = auto_context(**locals())
@@ -100,6 +114,7 @@ def remove(request, path):
 
     context.update({'form': form})
     return render_to_response('mediafiles/remove.html', context)
+remove = staff_member_required(remove)
 remove = path_process(remove)
 
 def rename(request, path):
@@ -131,6 +146,7 @@ def rename(request, path):
 
     context.update({'form': form})
     return render_to_response('mediafiles/rename.html', context)
+rename = staff_member_required(rename)
 rename = path_process(rename)
 
 def upload(request, path):
@@ -160,4 +176,5 @@ def upload(request, path):
 
     context.update({'form': form})
     return render_to_response('mediafiles/upload.html', context)
+upload = staff_member_required(upload)
 upload = path_process(upload)

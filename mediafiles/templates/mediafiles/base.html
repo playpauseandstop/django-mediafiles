@@ -25,6 +25,13 @@
         <div id="branding">
             <h1 id="site-name"><a href="{% url mediafiles_explorer "" %}">{% trans 'Mediafiles' %}</a></h1>
         </div>
+        {% if user.is_authenticated %}
+        <div id="user-tools">
+            {% blocktrans with user.get_full_name|default:user.username as user %}Welcome, <strong>{{ user }}</strong>{% endblocktrans %}.
+            <a href="/admin/">{% trans 'Back to admin' %}</a> /
+            <a href="{% url mediafiles_logout %}">Logout</a>
+        </div>
+        {% endif %}
     {% endblock %}</div>
 
     <div class="breadcrumbs">{% block breadcrumbs %}{% endblock %}</div>

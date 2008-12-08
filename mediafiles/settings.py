@@ -16,7 +16,8 @@ MEDIAFILES_DIRS_BLACKLIST = list(getattr(settings,
                                          'MEDIAFILES_DIRS_BLACKLIST',
                                          []))
 MEDIAFILES_DIRS_BLACKLIST.extend((
-    'mkdir', 'properties', 'rename', 'remove', 'upload'
+    'login', 'logout', 'mkdir', 'mkfile', 'properties', 'rename', 'remove',
+    'upload'
 ))
 
 # List of blacklisted file extensions. **Note**, add dot before extension,
