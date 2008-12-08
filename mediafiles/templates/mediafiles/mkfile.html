@@ -1,0 +1,31 @@
+{% extends 'mediafiles/explorer.html' %}
+{% load i18n %}
+{% block title %}: {% trans 'Make new file' %} {{ block.super }}{% endblock %}
+
+{% block page_content %}
+<h1>{% blocktrans with path.safe_path as path %}Make new file at {{ path }}{% endblocktrans %}</h1>
+
+<div id="content-main">
+    <form enctype="multipart/form-data" action="" method="post" id="mkdir_form"><div>
+        <fieldset class="module aligned">{% for f in form %}
+            <div class="form-row{% if f.errors %} errors{% endif %} {{ f.name }}">
+                {% if f.errors %}{{ f.errors }}{% endif %}
+                <div>
+                    <label for="{{ f.auto_id }}"{% if f.field.required %} class="required"{% endif %}>{{ f.label }}:</label>
+                    {{ f }}
+                    {% if f.help_text %}<p class="help">{{ f.help_text }}</p>{% endif %}
+                </div>
+            </div>
+        {% endfor %}</fieldset>
+    </div>
+
+    <div class="submit-row">
+        <input type="submit" value="{% trans 'Make file' %}" class="default" name="_save" />
+        <input type="submit" value="{% trans 'Make file and make another' %}" name="_addanother" />
+    </div></form>
+
+    <script type="text/javascript"><!--
+        document.getElementById('id_name').focus()
+    --></script>
+</div>
+{% endblock %}

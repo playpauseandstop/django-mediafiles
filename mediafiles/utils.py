@@ -139,6 +139,10 @@ class Path(object):
         return ('mediafiles_mkdir', (), {'path': self.safe_path.lstrip('/')})
     get_mkdir_url = permalink(get_mkdir_url)
 
+    def get_mkfile_url(self):
+        return ('mediafiles_mkfile', (), {'path': self.safe_path.lstrip('/')})
+    get_mkfile_url = permalink(get_mkfile_url)
+
     def get_remove_url(self):
         return ('mediafiles_remove', (), {'path': self.safe_path.lstrip('/')})
     get_remove_url = permalink(get_remove_url)
@@ -200,6 +204,16 @@ class Path(object):
         path = Path(name, self.path)
         if not path.exists() and not path.is_dir():
             os.mkdir(path.path)
+        return path
+
+    def mkfile(self, name, content):
+        path = Path(name, self.path)
+
+        if not path.exists() and not path.is_file():
+            fw = open(path.path, 'w+')
+            fw.write(content)
+            fw.close()
+
         return path
 
     def _get_mtime(self):
@@ -266,14 +280,14 @@ class Path(object):
         assert isinstance(file, UploadedFile), \
                'Only upload of UploadedFile objects was accepted.'
 
-        newpath = Path(file.name, self.path)
-        newfile = open(newpath.path, 'wb+')
+        path = Path(file.name, self.path)
+        fw = open(path.path, 'wb+')
 
         for chunk in file.chunks():
-            newfile.write(chunk)
+            fw.write(chunk)
 
-        newfile.close()
-        return newpath
+        fw.close()
+        return path
 
     def _get_dir_size(self, path=None):
         path = path or self.path

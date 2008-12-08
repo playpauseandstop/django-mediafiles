@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -5,18 +7,11 @@ from django.utils.translation import ugettext as _
 from settings import *
 
 
-__all__ = ('ChmodPathForm', 'ChownPathForm', 'MakeDirectoryForm',
-           'RemovePathForm', 'RenamePathForm', 'UploadForm')
-
-class ChmodPathForm(forms.Form):
-    pass
-
-class ChownPathForm(forms.Form):
-    pass
+__all__ = ('MakeDirectoryForm', 'MakeFileForm', 'RemovePathForm',
+           'RenamePathForm', 'UploadForm')
 
 class MakeDirectoryForm(forms.Form):
-    name = forms.CharField(label=_('Directory name'), min_length=1,
-        max_length=64)
+    name = forms.CharField(label=_('Directory name'), max_length=64)
 
     def __init__(self, *args, **kwargs):
         if not 'path' in kwargs:
@@ -26,13 +21,12 @@ class MakeDirectoryForm(forms.Form):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        dirs = self.path.list_dir(filter='dirs')
-
         if name in MEDIAFILES_DIRS_BLACKLIST:
             raise forms.ValidationError, \
                   _('Directory\'s name "%s" blacklisted by server settings.' % \
                     name)
 
+        dirs = self.path.list_dir(filter='dirs')
         for dir in dirs:
             if dir.name == name:
                 raise forms.ValidationError, \
@@ -58,8 +52,59 @@ class MakeDirectoryForm(forms.Form):
 
         return cd
 
+class MakeFileForm(forms.Form):
+    name = forms.CharField(label=_('File name'), max_length=64)
+    content = forms.CharField(label=_('Content'), required=False,
+        widget=forms.Textarea(attrs={'cols': 80, 'rows': 15}))
+
+    def __init__(self, *args, **kwargs):
+        if not 'path' in kwargs:
+            raise TypeError, 'Required keyword arg "path" was not supplied.'
+        self.path = kwargs.pop('path')
+        super(MakeFileForm, self).__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+
+        if name in MEDIAFILES_FILES_BLACKLIST:
+            raise forms.ValidationError, \
+                  _('File\'s name "%s" blacklisted by server settings.' %
+                    name)
+
+        ext = os.path.splitext(name)[1]
+        if ext in MEDIAFILES_EXTS_BLACKLIST:
+            raise forms.ValidationError, \
+                  _('File\'s extension "%s" blacklisted by server settings.' % \
+                    ext)
+
+        files = self.path.list_dir(filter='files')
+        for f in files:
+            if f.name == name:
+                raise forms.ValidationError, \
+                      _('File with name "%s" existed on this path.' % f.name)
+
+        return name
+
+    def clean(self):
+        cd = self.cleaned_data
+
+        if not cd or not 'name' in cd:
+            return cd
+
+        try:
+            self.path.mkfile(cd['name'], cd['content'])
+        except Exception, e:
+            print type(e), e
+            e = forms.ValidationError(
+                _("Couldn't make new file cause server error.")
+            )
+            self._errors['name'] = e.messages
+            raise e
+
+        return cd
+
 class RemovePathForm(forms.Form):
-    apply_remove = forms.BooleanField(label=_('Apply remove'), required=True)
+    accept_remove = forms.BooleanField(label=_('Accept remove'), required=True)
 
     def __init__(self, *args, **kwargs):
         if not 'path' in kwargs:
@@ -68,7 +113,7 @@ class RemovePathForm(forms.Form):
         super(RemovePathForm, self).__init__(*args, **kwargs)
 
         if self.path.is_dir():
-            self.fields['apply_remove'].help_text = \
+            self.fields['accept_remove'].help_text = \
                 _('All items existed in directory will be deleted.')
 
     def clean(self):
@@ -84,7 +129,7 @@ class RemovePathForm(forms.Form):
             e = forms.ValidationError(
                 _("Couldn't remove %s cause system error." % type)
             )
-            self._errors['apply_remove'] = e.messages
+            self._errors['accept_remove'] = e.messages
             raise e
 
         return cd
@@ -109,14 +154,14 @@ class RenamePathForm(forms.Form):
             if item.name == newname:
                 raise forms.ValidationError, \
                       _('Couldn\'t rename "%s" to "%s", cause this path ' \
-                        'existsed here.' % (self.path.name, newname))
+                        'existed here.' % (self.path.name, newname))
 
         return newname
 
     def clean(self):
         cd = self.cleaned_data
 
-        if not cd:
+        if not cd or not 'newname' in cd:
             return cd
 
         try:
@@ -133,6 +178,8 @@ class RenamePathForm(forms.Form):
 
 class UploadForm(forms.Form):
     file = forms.FileField(label=_('Select file to upload'), required=True)
+    accept_rewrite = forms.BooleanField(label=_('Accept file rewrite'),
+        required=False)
 
     def __init__(self, *args, **kwargs):
         if not 'path' in kwargs:
@@ -148,12 +195,34 @@ class UploadForm(forms.Form):
                   _('File\'s name "%s" blacklisted by server settings.' %
                     file.name)
 
+        ext = os.path.splitext(file.name)[1]
+        if ext in MEDIAFILES_EXTS_BLACKLIST:
+            raise forms.ValidationError, \
+                  _('File\'s extension "%s" blacklisted by server settings.' % \
+                    ext)
+
+        files = self.path.list_dir(filter='files')
+        for f in files:
+            if f.name == file.name:
+                setattr(self, '__file_existed', f.name)
+                break
+
         return file
+
+    def clean_accept_rewrite(self):
+        accept_rewrite = self.cleaned_data['accept_rewrite']
+
+        if hasattr(self, '__file_existed') and not accept_rewrite:
+            name = getattr(self, '__file_existed')
+            raise forms.ValidationError, \
+                  _('File with name "%s" existed on this path.' % name)
+
+        return accept_rewrite
 
     def clean(self):
         cd = self.cleaned_data
 
-        if not cd:
+        if not cd or not 'file' in cd:
             return cd
 
         try:

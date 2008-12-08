@@ -3,8 +3,9 @@ import os
 from django.conf import settings
 
 
-__all__ = ('DIRNAME', 'MEDIAFILES_DIRS_BLACKLIST', 'MEDIAFILES_FILES_BLACKLIST',
-           'MEDIAFILES_MEDIA_PREFIX', 'MEDIAFILES_MEDIA_ROOT')
+__all__ = ('DIRNAME', 'MEDIAFILES_DIRS_BLACKLIST', 'MEDIAFILES_EXTS_BLACKLIST',
+           'MEDIAFILES_FILES_BLACKLIST', 'MEDIAFILES_MEDIA_PREFIX',
+           'MEDIAFILES_MEDIA_ROOT')
 
 # Absolute path to current directory
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
@@ -17,6 +18,12 @@ MEDIAFILES_DIRS_BLACKLIST = list(getattr(settings,
 MEDIAFILES_DIRS_BLACKLIST.extend((
     'mkdir', 'properties', 'rename', 'remove', 'upload'
 ))
+
+# List of blacklisted file extensions. **Note**, add dot before extension,
+# like ``.txt`` instead of ``txt``.
+MEDIAFILES_EXTS_BLACKLIST = list(getattr(settings,
+                                         'MEDIAFILES_EXTS_BLACKLIST',
+                                         []))
 
 # List of blacklisted file names.
 MEDIAFILES_FILES_BLACKLIST = list(getattr(settings,

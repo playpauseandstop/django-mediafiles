@@ -52,6 +52,10 @@ th {
     width: 60%;
 }
 
+.form-row textarea {
+    width: 65%;
+}
+
 .form-row label {
     width: 15%;
 }

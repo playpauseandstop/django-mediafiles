@@ -25,7 +25,7 @@
 
     {% if path.is_file %}
     <ul class="object-tools">
-        <li><a href="{{ path.get_media_url }}" class="golink">{% trans 'Go to' %}</a></li>
+        <li><a href="{{ path.get_media_url }}" class="golink" onclick="this.target='_blank'">{% trans 'Go to' %}</a></li>
         <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
         <li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>
     </ul>
@@ -59,8 +59,8 @@
     {% else %}{% if path.is_writeable %}
     <ul class="object-tools">
         <li><a href="{{ path.get_mkdir_url }}" class="addlink">{% trans 'Mkdir' %}</a></li>
+        <li><a href="{{ path.get_mkfile_url }}" class="addlink">{% trans 'Mkfile' %}</a></li>
         <li><a href="{{ path.get_upload_url }}" class="addlink">{% trans 'Upload' %}</a></li>
-        <li><a href="{{ path.get_properties_url }}" class="changelink">{% trans 'Properties' %}</a></li>
         {% if not path.is_root %}<li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>{% endif %}
     </ul>{% endif %}
 
