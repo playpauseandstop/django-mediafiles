@@ -31,7 +31,8 @@
     <div id="content" class="flex">{% block page_content %}{% endblock %}</div>
 
     <p id="footer">{% block footer %}
-        <a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a> {{ version }}
+        <a href="http://code.google.com/p/django-mediafiles/" onclick="this.target='_blank'">django-mediafiles</a>
+        <a href="http://github.com/playpauseandstop/django-mediafiles/commit/{{ version_commit }}" onclick="this.target='_blank'">{{ version }}</a>
     {% endblock %}</p>
 
 </body>

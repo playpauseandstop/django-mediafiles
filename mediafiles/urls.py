@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 
 from settings import *
 
+
 if settings.DEBUG:
     urlpatterns = patterns('django.views.static',
         url(r'^%s/(?P<path>.*)' % MEDIAFILES_MEDIA_PREFIX.strip('/'), 'serve',

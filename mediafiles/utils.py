@@ -14,18 +14,40 @@ from django.template import Context, RequestContext
 from django.utils.translation import ugettext as _
 
 
-__all__ = ('Path', 'auto_context', 'get_media_prefix', 'get_version',
-           'permval')
+__all__ = ('Path', 'auto_context', 'get_last_commit', 'get_media_prefix',
+           'get_version', 'permval')
+
+__commit = None
 
 def auto_context(request=None, path=None):
     if request:
         return RequestContext(request, {'media_prefix': get_media_prefix(),
                                         'path': path,
-                                        'version': get_version()})
+                                        'version': get_version(),
+                                        'version_commit': get_last_commit()})
     else:
         return Context({'media_prefix': get_media_prefix(),
                         'path': path,
-                        'version': get_version()})
+                        'version': get_version(),
+                        'version_commit': get_last_commit()})
+
+def get_last_commit():
+    global __commit
+    if __commit is not None:
+        return __commit
+
+    from settings import DIRNAME
+    git = os.path.abspath(os.path.join(DIRNAME, '../.git/logs/HEAD'))
+
+    if not os.path.isfile(git):
+        return None
+
+    fr = open(git, 'r')
+    lines = fr.readlines()
+    __commit = lines[len(lines) - 1].split(' ')[1]
+    fr.close()
+
+    return __commit
 
 def get_media_prefix():
     from settings import MEDIAFILES_MEDIA_PREFIX
@@ -36,20 +58,13 @@ def get_media_prefix():
 def get_version():
     from . import VERSION
     if len(VERSION) == 2:
-        return '%s.%s'
+        return u'%s.%s' % (VERSION[0], VERSION[1])
 
-    from settings import DIRNAME
-    git = os.path.abspath(os.path.join(DIRNAME, '../.git/logs/HEAD'))
+    commit = get_last_commit()
+    if commit is None:
+        return u'%s.%s-%s' % (VERSION[0], VERSION[1], VERSION[2])
 
-    if not os.path.isfile(git):
-        return '%s.%s-%s' % (VERSION[0], VERSION[1], VERSION[2])
-
-    fr = open(git, 'r')
-    lines = fr.readlines()
-    commit = lines[len(lines) - 1].split(' ')[1]
-    fr.close()
-
-    return '%s.%s-%s-%s' % (VERSION[0], VERSION[1], VERSION[2], commit)
+    return u'%s.%s-%s-%s' % (VERSION[0], VERSION[1], VERSION[2], commit)
 
 class Path(object):
     def __init__(self, path, root):
