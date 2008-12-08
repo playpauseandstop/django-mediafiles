@@ -1,5 +1,5 @@
 {% extends 'mediafiles/base.html' %}
-{% load i18n %}
+{% load humanize i18n %}
 
 {% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
 
@@ -24,9 +24,42 @@
 <div id="content-main">
 
     {% if path.is_file %}
+    <ul class="object-tools">
+        <li><a href="{{ path.get_media_url }}" class="golink">{% trans 'Go to' %}</a></li>
+        <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
+        <li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>
+    </ul>
+
+    <div id="content-main">
+        <div class="module aligned">
+            <h2>{% trans 'File information' %}</h2>
+
+            <div class="form-row">
+                <div>
+                    <label>{% trans 'Content-Type:' %}</label>
+                    <div class="fakeinput">{{ path.content_type }}</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>{% trans 'Last modified at:' %}</label>
+                    <div class="fakeinput">{% blocktrans with path.mtime|naturalday as date and path.mtime|time as time %}{{ date }}, {{ time }}{% endblocktrans %}</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>{% trans 'Size:' %}</label>
+                    <div class="fakeinput">{{ path.size|filesizeformat }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% else %}{% if path.is_writeable %}
     <ul class="object-tools">
         <li><a href="{{ path.get_mkdir_url }}" class="addlink">{% trans 'Mkdir' %}</a></li>
+        <li><a href="{{ path.get_upload_url }}" class="addlink">{% trans 'Upload' %}</a></li>
         <li><a href="{{ path.get_properties_url }}" class="changelink">{% trans 'Properties' %}</a></li>
         {% if not path.is_root %}<li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>{% endif %}
     </ul>{% endif %}

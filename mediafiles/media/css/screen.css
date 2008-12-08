@@ -56,6 +56,11 @@ th {
     width: 15%;
 }
 
+.form-row .fakeinput {
+    font-size: 12px;
+    padding-top: 3px;
+}
+
 .form-row .help {
     margin-left: 15%;
     padding-left: 0 !important;

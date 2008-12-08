@@ -2,8 +2,12 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from fields import *
+from settings import *
+
+
 __all__ = ('ChmodPathForm', 'ChownPathForm', 'MakeDirectoryForm',
-           'RemovePathForm', 'RenamePathForm')
+           'RemovePathForm', 'RenamePathForm', 'UploadForm')
 
 class ChmodPathForm(forms.Form):
     pass
@@ -24,6 +28,11 @@ class MakeDirectoryForm(forms.Form):
     def clean_name(self):
         name = self.cleaned_data['name']
         dirs = self.path.list_dir(filter='dirs')
+
+        if name in MEDIAFILES_DIRS_BLACKLIST:
+            raise forms.ValidationError, \
+                  _('Directory\'s name "%s" blacklisted by server settings.' % \
+                    name)
 
         for dir in dirs:
             if dir.name == name:
@@ -119,6 +128,42 @@ class RenamePathForm(forms.Form):
                 _("Couldn't rename %s cause system error." % unicode(type))
             )
             self._errors['newname'] = e.messages
+            raise e
+
+        return cd
+
+class UploadForm(forms.Form):
+    file = forms.FileField(label=_('Select file to upload'), required=True)
+
+    def __init__(self, *args, **kwargs):
+        if not 'path' in kwargs:
+            raise TypeError, 'Required keyword arg "path" was not supplied.'
+        self.path = kwargs.pop('path')
+        super(UploadForm, self).__init__(*args, **kwargs)
+
+    def clean_file(self):
+        file = self.cleaned_data['file']
+
+        if file.name in MEDIAFILES_FILES_BLACKLIST:
+            raise forms.ValidationError, \
+                  _('File\'s name "%s" blacklisted by server settings.' %
+                    file.name)
+
+        return file
+
+    def clean(self):
+        cd = self.cleaned_data
+
+        if not cd:
+            return cd
+
+        try:
+            self.path.upload(cd['file'])
+        except Exception, e:
+            e = forms.ValidationError(
+                _('Couldn\'t upload file cause system error.')
+            )
+            self._errors['file'] = e.messages
             raise e
 
         return cd

@@ -1,9 +1,18 @@
-import os, shutil, sys
+import mimetypes
+import os
+import shutil
+import sys
+
+from datetime import datetime
+from urlparse import urljoin
 
 from django.conf import settings
+from django.core.files.uploadedfile import UploadedFile
 from django.core.urlresolvers import reverse
 from django.db.models import permalink
 from django.template import Context, RequestContext
+from django.utils.translation import ugettext as _
+
 
 __all__ = ('Path', 'auto_context', 'get_media_prefix', 'get_version',
            'permval')
@@ -73,12 +82,43 @@ class Path(object):
     def __unicode__(self):
         return u'%s' % self.url
 
+    def _get_atime(self):
+        assert self.exists(), 'This attribute allowed only for exists pathes.'
+        if not hasattr(self, '__stat'):
+            self.__stat = os.stat(self.path)
+        return datetime.fromtimestamp(self.__stat.st_atime)
+    atime = property(_get_atime)
+
+    def _get_content_type(self):
+        if not hasattr(self, '__content_type'):
+            if not mimetypes.inited:
+                mimetypes.init()
+            setattr(self,
+                    '__content_type',
+                    mimetypes.types_map.get(self.extension, _('unknown')))
+        return getattr(self, '__content_type')
+    content_type = property(_get_content_type)
+
+    def _get_ctime(self):
+        assert self.exists(), 'This attribute allowed only for exists pathes.'
+        if not hasattr(self, '__stat'):
+            self.__stat = os.stat(self.path)
+        return datetime.fromtimestamp(self.__stat.st_ctime)
+    ctime = property(_get_ctime)
+
     def exists(self):
         return self.is_dir() or self.is_file()
+
+    def _get_extension(self):
+        return os.path.splitext(self.name)[1]
+    extension = property(_get_extension)
 
     def get_absolute_url(self):
         return ('mediafiles_explorer', (), {'path': self.safe_path.lstrip('/')})
     get_absolute_url = permalink(get_absolute_url)
+
+    def get_media_url(self):
+        return urljoin(settings.MEDIA_URL, self.safe_path.lstrip('/'))
 
     def get_mkdir_url(self):
         return ('mediafiles_mkdir', (), {'path': self.safe_path.lstrip('/')})
@@ -94,6 +134,10 @@ class Path(object):
 
     def get_parent_url(self):
         return self.parent.get_absolute_url()
+
+    def get_upload_url(self):
+        return ('mediafiles_upload', (), {'path': self.safe_path.lstrip('/')})
+    get_upload_url = permalink(get_upload_url)
 
     def is_dir(self):
         return os.path.isdir(self.path)
@@ -142,6 +186,13 @@ class Path(object):
         if not path.exists() and not path.is_dir():
             os.mkdir(path.path)
         return path
+
+    def _get_mtime(self):
+        assert self.exists(), 'This attribute allowed only for exists pathes.'
+        if not hasattr(self, '__stat'):
+            self.__stat = os.stat(self.path)
+        return datetime.fromtimestamp(self.__stat.st_mtime)
+    mtime = property(_get_mtime)
 
     def _get_parent(self):
         if self.is_root():
@@ -194,6 +245,20 @@ class Path(object):
             return getattr(self, '__size_cache')
         return os.path.getsize(self.path)
     size = property(_get_size)
+
+    def upload(self, file):
+        assert self.is_dir(), 'Can not upload file to not a directory.'
+        assert isinstance(file, UploadedFile), \
+               'Only upload of UploadedFile objects was accepted.'
+
+        newpath = Path(file.name, self.path)
+        newfile = open(newpath.path, 'wb+')
+
+        for chunk in file.chunks():
+            newfile.write(chunk)
+
+        newfile.close()
+        return newpath
 
     def _get_dir_size(self, path=None):
         path = path or self.path

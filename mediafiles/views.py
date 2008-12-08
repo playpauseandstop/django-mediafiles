@@ -108,3 +108,32 @@ def rename(request, path):
     context.update({'form': form})
     return render_to_response('mediafiles/rename.html', context)
 rename = path_process(rename)
+
+def upload(request, path):
+    context = auto_context(**locals())
+
+    if not path.exists():
+        return render_to_response('mediafiles/404.html', context)
+
+    if not path.is_writeable():
+        return render_to_response('mediafiles/403.html', context)
+
+    add_another = request.REQUEST.get('_addanother', False)
+
+    if add_another:
+        redirect_to = request.path
+    else:
+        redirect_to = request.REQUEST.get('next', None)
+        if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
+            redirect_to = path.get_absolute_url()
+
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES, path=path)
+        if form.is_valid():
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = UploadForm(path=path)
+
+    context.update({'form': form})
+    return render_to_response('mediafiles/upload.html', context)
+upload = path_process(upload)
