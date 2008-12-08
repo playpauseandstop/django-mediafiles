@@ -11,7 +11,7 @@ your Django project. Now ``django-mediafiles`` supports:
  * Text files editing in browser
 
 **NOTE**: Possibilities that supported current version of
-``django-mediafiles`` labeled by ** + **.
+``django-mediafiles`` labeled by **+**.
 
 Basic installation
 ==================
