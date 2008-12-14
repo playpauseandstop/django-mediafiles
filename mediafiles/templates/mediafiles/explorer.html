@@ -1,7 +1,10 @@
 {% extends 'mediafiles/base.html' %}
-{% load humanize i18n %}
+{% load humanize i18n mediafiles_tags %}
 
 {% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
+{% block extra_style %}{% if path.is_file %}
+    <link rel="stylesheet" type="text/css" href="{% url mediafiles_pygments_css %}" media="all" />
+{% endif %}{% endblock %}
 
 {% block breadcrumbs %}{% if path.is_root and not form %}
     {% trans 'Home' %}
@@ -23,7 +26,7 @@
 
 <div id="content-main">
 
-    {% if path.is_file %}
+    {% if path.is_file %}{% get_file_content path as content %}
     <ul class="object-tools">
         <li><a href="{{ path.get_media_url }}" class="golink" onclick="this.target='_blank'">{% trans 'Go to' %}</a></li>
         <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
@@ -55,6 +58,12 @@
                 </div>
             </div>
         </div>
+
+        {% if content %}<div class="module aligned">
+            <h2>{% trans 'File content' %}</h2>
+
+            <div class="form-row">{% show_file_content path %}</div>
+        </div>{% endif %}
     </div>
     {% else %}{% if path.is_writeable %}
     <ul class="object-tools">
@@ -83,12 +92,11 @@
         {% for f in path.list_dir %}
         <tr class="row{% cycle 1 2 %}" onmouseover="this.className='alt'" onmouseout="this.className='row{% cycle 1 2 %}'">
             <td class="{{ f.get_icon_class }}"></td>
-            {% if f.is_dir %}<td class="path path-directory" onclick="location.href='{{ f.get_absolute_url }}'">
+            <td class="{% if f.is_dir %}path{% endif %} pointer" onclick="location.href='{{ f.get_absolute_url }}'" title="{% if f.is_dir %}{% trans 'Open directory page' %}{% else %}{% trans 'Open file page' %}{% endif %}">
                 <a href="{{ f.get_absolute_url }}">{{ f.url }}</a>
-            </td>{% else %}
-            <td class="path">{{ f.url }}</td>{% endif %}
+            </td>
             <td>{{ f.size|filesizeformat }}</td>
-            <td class="show">{% if f.is_readable %}<a href="{{ f.get_absolute_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Show' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="show">{% if f.is_readable %}<a href="{{ f.get_media_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Go to' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
             <td class="rename">{% if f.is_writeable %}<a href="{{ f.get_rename_url }}">{% else %}<span class="disabled">{% endif %}{% trans 'Rename' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
             <td class="chmod"><span class="disabled">{% trans 'Chmod' %}</span></td>
             <td class="chown"><span class="disabled">{% trans 'Chown' %}</span></td>
