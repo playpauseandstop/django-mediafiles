@@ -11,7 +11,7 @@
     <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a> &rsaquo;
     {% for p in path.parts %}{% if not forloop.last %}
         <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a> &rsaquo;
-    {% else %}{% if p.is_dir and form %}
+    {% else %}{% if form %}
         <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a>
     {% else %}
         {{ p.url|cut:"/" }}
