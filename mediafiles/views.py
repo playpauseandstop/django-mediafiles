@@ -1,10 +1,14 @@
+from pygments.formatters import HtmlFormatter
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.views.decorators.cache import cache_page
 
 from decorators import *
 from forms import *
+from settings import MEDIAFILES_PYGMENTS_STYLE
 from utils import auto_context
 
 
@@ -78,6 +82,16 @@ def mkfile(request, path):
     return render_to_response('mediafiles/mkfile.html', context)
 mkfile = staff_member_required(mkfile)
 mkfile = path_process(mkfile)
+
+def pygments_css(request):
+    formatter = HtmlFormatter(nobackground=True,
+                              style=MEDIAFILES_PYGMENTS_STYLE)
+
+    response = HttpResponse("@charset 'utf-8';\n", mimetype='text/css')
+    response.write(formatter.get_style_defs('.highlight'))
+
+    return response
+pygments_css = cache_page(pygments_css, 86400)
 
 def remove(request, path):
     context = auto_context(**locals())

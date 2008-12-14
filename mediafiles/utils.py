@@ -104,13 +104,22 @@ class Path(object):
         return datetime.fromtimestamp(self.__stat.st_atime)
     atime = property(_get_atime)
 
+    def _get_content(self):
+        assert self.exists(), 'This attribute allowed only for exists pathes.'
+        if not hasattr(self, '__content'):
+            fr = open(self.path)
+            content = fr.read()
+            fr.close()
+            setattr(self, '__content', content)
+        return getattr(self, '__content')
+    content = property(_get_content)
+
     def _get_content_type(self):
         if not hasattr(self, '__content_type'):
-            if not mimetypes.inited:
-                mimetypes.init()
-            setattr(self,
-                    '__content_type',
-                    mimetypes.types_map.get(self.extension, _('unknown')))
+            content_type = mimetypes.guess_type(self.name)[0]
+            if content_type is None:
+                content_type = _('unknown')
+            setattr(self, '__content_type', content_type)
         return getattr(self, '__content_type')
     content_type = property(_get_content_type)
 
