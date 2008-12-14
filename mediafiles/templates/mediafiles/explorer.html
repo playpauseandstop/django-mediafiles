@@ -61,8 +61,7 @@
 
         {% if content %}<div class="module aligned">
             <h2>{% trans 'File content' %}</h2>
-
-            <div class="form-row">{% show_file_content path %}</div>
+            <div class="form-row">{{ content }}</div>
         </div>{% endif %}
     </div>
     {% else %}{% if path.is_writeable %}
