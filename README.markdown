@@ -13,6 +13,15 @@ your Django project. Now ``django-mediafiles`` supports:
 **NOTE**: Possibilities that supported current version of
 ``django-mediafiles`` labeled by **+**.
 
+Requirements
+============
+
+ * Pygments 1.0 or later needed for source code highlight
+   http://pygments.org/
+   http://pypi.python.org/packages/source/P/Pygments/Pygments-1.0.tar.gz
+   easy_install Pygments
+   hg clone http://dev.pocoo.org/hg/pygments-main pygments
+
 Basic installation
 ==================
 
