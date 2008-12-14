@@ -35,7 +35,7 @@ th {
     width: 60%;
 }
 
-#explorer .path-directory, #explorer .row-back {
+#explorer .pointer, #explorer .row-back {
     cursor: pointer;
 }
 
@@ -46,6 +46,10 @@ th {
 #footer {
     margin: 0 !important;
     font-size: 0.9em;
+}
+
+.centerize {
+    text-align: center;
 }
 
 .form-row input[type="text"] {
