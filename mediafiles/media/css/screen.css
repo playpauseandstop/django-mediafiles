@@ -4,6 +4,11 @@ body, table, td, th {
     font-family: 'Lucida Sans Unicode', 'Tahoma', 'Verdana', 'Arial', sans-serif;
 }
 
+code, pre {
+    font-family: 'Lucida Console', 'DejaVu Sans Mono', monospace;
+    font-size: 9pt;
+}
+
 table {
     width: 100%;
 }
