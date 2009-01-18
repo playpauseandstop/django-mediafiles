@@ -1,6 +1,6 @@
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
-from pygments.lexers import get_lexer_for_filename
+from pygments.lexers import guess_lexer_for_filename
 from pygments.util import ClassNotFound
 
 from django.template import Library, Node, TemplateSyntaxError, Variable
@@ -26,9 +26,10 @@ class FileContentNode(Node):
                                         context)
         else:
             try:
-                lexer = get_lexer_for_filename(path.name,
-                                               stripnl=False,
-                                               tabsize=4)
+                lexer = guess_lexer_for_filename(path.name,
+                                                 path.content,
+                                                 stripnl=False,
+                                                 tabsize=4)
             except ClassNotFound:
                 rendered = None
             else:
