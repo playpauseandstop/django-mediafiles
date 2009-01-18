@@ -141,6 +141,10 @@ class Path(object):
         return ('mediafiles_explorer', (), {'path': self.safe_path.lstrip('/')})
     get_absolute_url = permalink(get_absolute_url)
 
+    def get_edit_url(self):
+        return ('mediafiles_edit', (), {'path': self.safe_path.lstrip('/')})
+    get_edit_url = permalink(get_edit_url)
+
     def get_media_url(self):
         return urljoin(settings.MEDIA_URL, self.safe_path.lstrip('/'))
 
@@ -297,6 +301,15 @@ class Path(object):
 
         fw.close()
         return path
+
+    def write(self, content):
+        assert self.is_file(), 'Can not write content to not a file.'
+
+        fw = open(self.path, 'wb+')
+        fw.write(content)
+        fw.close()
+
+        return self
 
     def _get_dir_size(self, path=None):
         path = path or self.path

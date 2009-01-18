@@ -12,10 +12,49 @@ from settings import MEDIAFILES_PYGMENTS_STYLE
 from utils import auto_context
 
 
-def explorer(request, path):
+def edit(request, path):
     context = auto_context(**locals())
+
     if not path.exists():
         return render_to_response('mediafiles/404.html', context)
+
+    if not path.is_readable():
+        return render_to_response('mediafiles/403.html', context)
+
+    if path.is_dir():
+        return HttpResponseRedirect(reverse('mediafiles_rename',
+                                            kwargs={'path': path}))
+
+    continue_editing = request.POST.get('_continue', False)
+
+    if continue_editing:
+        redirect_to = request.path
+    else:
+        redirect_to = request.REQUEST.get('next', None)
+        if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
+            redirect_to = path.get_absolute_url()
+
+    if request.method == 'POST':
+        form = EditFileForm(request.POST, path=path)
+        if form.is_valid():
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = EditFileForm(path=path)
+
+    context.update({'form': form})
+    return render_to_response('mediafiles/edit.html', context)
+edit = staff_member_required(edit)
+edit = path_process(edit)
+
+def explorer(request, path):
+    context = auto_context(**locals())
+
+    if not path.exists():
+        return render_to_response('mediafiles/404.html', context)
+
+    if not path.is_readable():
+        return render_to_response('mediafiles/403.html', context)
+
     return render_to_response('mediafiles/explorer.html', context)
 explorer = staff_member_required(explorer)
 explorer = path_process(explorer)
@@ -102,9 +141,6 @@ def remove(request, path):
     if not path.exists():
         return render_to_response('mediafiles/404.html', context)
 
-    if not path.is_writeable():
-        return render_to_response('mediafiles/403.html', context)
-
     redirect_to = request.REQUEST.get('next', None)
 
     if redirect_to is None or ' ' in redirect_to or '\\' in redirect_to:
@@ -130,9 +166,6 @@ def rename(request, path):
 
     if not path.exists():
         return render_to_response('mediafiles/404.html', context)
-
-    if not path.is_writeable():
-        return render_to_response('mediafiles/403.html', context)
 
     redirect_to = request.REQUEST.get('next', None)
 

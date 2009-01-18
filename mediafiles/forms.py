@@ -7,8 +7,35 @@ from django.utils.translation import ugettext as _
 from settings import *
 
 
-__all__ = ('MakeDirectoryForm', 'MakeFileForm', 'RemovePathForm',
-           'RenamePathForm', 'UploadForm')
+__all__ = ('EditFileForm', 'MakeDirectoryForm', 'MakeFileForm',
+           'RemovePathForm', 'RenamePathForm', 'UploadForm')
+
+class EditFileForm(forms.Form):
+    content = forms.CharField(label=_('Content'), required=False,
+        widget=forms.Textarea(attrs={'cols': 80, 'rows': 25}))
+
+    def __init__(self, *args, **kwargs):
+        if not 'path' in kwargs:
+            raise TypeError, 'Required keyword arg "path" was not supplied.'
+        self.path = kwargs.pop('path')
+
+        kwargs.update({'initial': {'content': self.path.content}})
+        super(EditFileForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cd = self.cleaned_data
+        content = cd.get('content', '')
+
+        try:
+            self.path.write(content)
+        except Exception, e:
+            e = forms.ValidationError(
+                _("Couldn't write to file at this path cause system error.")
+            )
+            self._errors['content'] = e.messages
+            raise e
+
+        return cd
 
 class MakeDirectoryForm(forms.Form):
     name = forms.CharField(label=_('Directory name'), max_length=64)
