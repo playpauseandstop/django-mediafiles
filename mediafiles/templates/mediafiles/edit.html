@@ -1,0 +1,31 @@
+{% extends 'mediafiles/explorer.html' %}
+{% load i18n %}
+{% block title %}: {% trans 'Edit file' %} {{ block.super }}{% endblock %}
+
+{% block page_content %}
+<h1>{% blocktrans with path.safe_path as path %}Edit file {{ path }}{% endblocktrans %}</h1>
+
+<div id="content-main">
+    <form enctype="multipart/form-data" action="" method="post" id="edit_form"><div>
+        <fieldset class="module aligned">{% for f in form %}
+            <div class="form-row{% if f.errors %} errors{% endif %} {{ f.name }}">
+                {% if f.errors %}{{ f.errors }}{% endif %}
+                <div>
+                    <label for="{{ f.auto_id }}" class="required">{{ f.label }}:</label>
+                    {{ f }}
+                    {% if f.help_text %}<p class="help">{{ f.help_text }}</p>{% endif %}
+                </div>
+            </div>
+        {% endfor %}</fieldset>
+    </div>
+
+    <div class="submit-row">
+        <input type="submit" value="{% trans 'Edit file' %}" class="default" name="_save" />
+        <input type="submit" value="{% trans 'Edit file and continue editing' %}" name="_continue" />
+    </div></form>
+
+    <script type="text/javascript"><!--
+        document.getElementById('id_content').focus()
+    --></script>
+</div>
+{% endblock %}

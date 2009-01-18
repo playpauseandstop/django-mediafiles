@@ -29,6 +29,7 @@
     {% if path.is_file %}{% get_file_content path as content %}
     <ul class="object-tools">
         <li><a href="{{ path.get_media_url }}" class="golink" onclick="this.target='_blank'">{% trans 'Go to' %}</a></li>
+        {% if content %}<li><a href="{{ path.get_edit_url }}" class="changelink">{% trans 'Edit' %}</a></li>{% endif %}
         <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
         <li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>
     </ul>
@@ -62,6 +63,10 @@
         {% if content %}<div class="module aligned">
             <h2>{% trans 'File content' %}</h2>
             <div class="form-row">{{ content }}</div>
+        </div>
+        <div class="submit-row">
+            <input type="button" value="{% trans 'Edit this file' %}" class="default"
+                   onclick="location.href = '{{ path.get_edit_url }}'" />
         </div>{% endif %}
     </div>
     {% else %}{% if path.is_writeable %}
@@ -77,7 +82,7 @@
             <th class="icon"></th>
             <th>{% trans 'Path' %}</th>
             <th>{% trans 'Size' %}</th>
-            <th colspan="5">{% trans 'Actions' %}</th>
+            <th colspan="6">{% trans 'Actions' %}</th>
         </tr>
         {% if not path.is_root %}
         <tr class="row2 row-back" title="{% trans 'Back to parent directory' %}"
@@ -86,7 +91,7 @@
             onmouseout="this.className=this.className.replace('alt', 'row2')">
             <td class="back"></td>
             <td class="path"><a href="{{ path.get_parent_url }}">..</a></td>
-            <td colspan="6"></td>
+            <td colspan="7"></td>
         </tr>{% endif %}
         {% for f in path.list_dir %}
         <tr class="row{% cycle 1 2 %}" onmouseover="this.className='alt'" onmouseout="this.className='row{% cycle 1 2 %}'">
@@ -96,10 +101,11 @@
             </td>
             <td>{{ f.size|filesizeformat }}</td>
             <td class="show">{% if f.is_readable %}<a href="{{ f.get_media_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Go to' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
-            <td class="rename">{% if f.is_writeable %}<a href="{{ f.get_rename_url }}">{% else %}<span class="disabled">{% endif %}{% trans 'Rename' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
-            <td class="chmod"><span class="disabled">{% trans 'Chmod' %}</span></td>
-            <td class="chown"><span class="disabled">{% trans 'Chown' %}</span></td>
-            <td class="delete">{% if f.is_writeable %}<a href="{{ f.get_remove_url }}">{% else %}<span class="disabled">{% endif %}{% trans 'Delete' %}{% if f.is_writeable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="rename"><a href="{{ f.get_rename_url }}">{% trans 'Rename' %}</a></td>
+            <td class="copy"><span class="disabled">{% trans 'Copy to' %}</span></td>
+            <td class="move"><span class="disabled">{% trans 'Move to' %}</span></td>
+            <td class="properties"><span class="disabled">{% trans 'Properties' %}</span></td>
+            <td class="delete"><a href="{{ f.get_remove_url }}">{% trans 'Delete' %}</a></td>
         </tr>{% endfor %}
     </table>{% endif %}
 
