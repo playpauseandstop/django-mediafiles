@@ -11,6 +11,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.core.urlresolvers import reverse
 from django.db.models import permalink
 from django.template import Context, RequestContext
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 
@@ -95,7 +96,7 @@ class Path(object):
         return self.url
 
     def __unicode__(self):
-        return u'%s' % self.url
+        return force_unicode(self.url)
 
     def _get_atime(self):
         assert self.exists(), 'This attribute allowed only for exists pathes.'
@@ -194,7 +195,7 @@ class Path(object):
 
     def list_dir(self, filter=None, order=None, desc=None):
         if not self.is_dir():
-            raise TypeError, '<%s> is not a valid directory path.' % self.path
+            raise TypeError, '%r is not a valid directory path.' % self.path
 
         filter = filter or 'all'
         if filter not in ('all', 'dirs', 'files', 'links'):
@@ -203,13 +204,16 @@ class Path(object):
         data = os.listdir(self.path)
         dirs, files = [], []
         for i, path in enumerate(data):
+            path = force_unicode(path)
             path = os.path.join(self.safe_path, path).lstrip('/')
             path = Path(path, self.__root)
             if path.is_dir() and filter in ('all', 'dirs'):
                 dirs.append(path)
             elif filter not in ('dirs',):
                 files.append(path)
-        sort_cmp = lambda x,y: cmp(x.__str__().lower(), y.__str__().lower())
+
+        sort_cmp = lambda x,y: cmp(force_unicode(x).lower(),
+                                   force_unicode(y).lower())
         dirs.sort(sort_cmp), files.sort(sort_cmp)
         return dirs + files
 
