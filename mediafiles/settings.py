@@ -17,7 +17,8 @@ MEDIAFILES_DIRS_BLACKLIST = list(getattr(settings,
                                          'MEDIAFILES_DIRS_BLACKLIST',
                                          []))
 MEDIAFILES_DIRS_BLACKLIST.extend((
-    'logout', 'mkdir', 'mkfile', 'properties', 'rename', 'remove', 'upload'
+    'edit', 'logout', 'mkdir', 'mkfile', 'properties', 'rename', 'remove',
+    'upload'
 ))
 
 # List of blacklisted file extensions. **Note**, add dot before extension,
@@ -30,6 +31,17 @@ MEDIAFILES_EXTS_BLACKLIST = list(getattr(settings,
 MEDIAFILES_FILES_BLACKLIST = list(getattr(settings,
                                           'MEDIAFILES_FILES_BLACKLIST',
                                           []))
+
+# Hide all **SCM** (``.git``, ``.svn`` and other) directories from explorer.
+MEDIAFILES_HIDE_SCM_DIRS = getattr(settings, 'MEDIAFILES_HIDE_SCM_DIRS', True)
+
+if MEDIAFILES_HIDE_SCM_DIRS:
+    MEDIAFILES_DIRS_BLACKLIST.extend(('.bzr',
+                                      'CVS',
+                                      '_darcs',
+                                      '.git',
+                                      '.hg',
+                                      '.svn'))
 
 # List of image mimetypes.
 MEDIAFILES_IMAGES = list(getattr(settings,

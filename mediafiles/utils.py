@@ -14,6 +14,9 @@ from django.template import Context, RequestContext
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from settings import MEDIAFILES_DIRS_BLACKLIST, MEDIAFILES_FILES_BLACKLIST, \
+                     MEDIAFILES_MEDIA_PREFIX
+
 
 __all__ = ('Path', 'auto_context', 'get_last_commit', 'get_media_prefix',
            'get_version', 'permval')
@@ -51,7 +54,6 @@ def get_last_commit():
     return __commit
 
 def get_media_prefix():
-    from settings import MEDIAFILES_MEDIA_PREFIX
     if settings.DEBUG and MEDIAFILES_MEDIA_PREFIX[0] != '/':
         return reverse('mediafiles_media', args=(), kwargs={'path': ''})
     return MEDIAFILES_MEDIA_PREFIX
@@ -208,8 +210,12 @@ class Path(object):
             path = os.path.join(self.safe_path, path).lstrip('/')
             path = Path(path, self.__root)
             if path.is_dir() and filter in ('all', 'dirs'):
+                if path.name in MEDIAFILES_DIRS_BLACKLIST:
+                    continue
                 dirs.append(path)
             elif filter not in ('dirs',):
+                if path.name in MEDIAFILES_FILES_BLACKLIST:
+                    continue
                 files.append(path)
 
         sort_cmp = lambda x,y: cmp(force_unicode(x).lower(),
