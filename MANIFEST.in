@@ -1,0 +1,3 @@
+include README.rst
+recursive-include mediafiles/media/ *
+recursive-include mediafiles/templates/ *
