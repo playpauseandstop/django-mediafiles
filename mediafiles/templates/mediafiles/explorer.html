@@ -26,10 +26,10 @@
 
 <div id="content-main">
 
-    {% if path.is_file %}{% get_file_content path as content %}
+    {% if path.is_file %}{% get_file_content path as content,content_editable %}
     <ul class="object-tools">
         <li><a href="{{ path.get_media_url }}" class="golink" onclick="this.target='_blank'">{% trans 'Go to' %}</a></li>
-        {% if content %}<li><a href="{{ path.get_edit_url }}" class="changelink">{% trans 'Edit' %}</a></li>{% endif %}
+        {% if content_editable %}<li><a href="{{ path.get_edit_url }}" class="changelink">{% trans 'Edit' %}</a></li>{% endif %}
         <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
         <li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>
     </ul>
@@ -64,10 +64,10 @@
             <h2>{% trans 'File content' %}</h2>
             <div class="form-row">{{ content }}</div>
         </div>
-        <div class="submit-row">
+        {% if content_editable %}<div class="submit-row">
             <input type="button" value="{% trans 'Edit this file' %}" class="default"
                    onclick="location.href = '{{ path.get_edit_url }}'" />
-        </div>{% endif %}
+        </div>{% endif %}{% endif %}
     </div>
     {% else %}{% if path.is_writeable %}
     <ul class="object-tools">

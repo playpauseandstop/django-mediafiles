@@ -1,3 +1,5 @@
+import string
+
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import guess_lexer_for_filename
@@ -13,12 +15,13 @@ from mediafiles.settings import MEDIAFILES_IMAGES, MEDIAFILES_PYGMENTS_STYLE
 register = Library()
 
 class FileContentNode(Node):
-    def __init__(self, path, context_var=None):
-        self.context_var = context_var
+    def __init__(self, path, content=None, content_editable=None):
+        self.content, self.content_editable = content, content_editable
         self.path = Variable(path)
 
     def render(self, context):
         path = self.path.resolve(context)
+        content_editable = False
         content_type = path.content_type
 
         if content_type in MEDIAFILES_IMAGES:
@@ -38,20 +41,23 @@ class FileContentNode(Node):
                                           nobackground=True,
                                           style=MEDIAFILES_PYGMENTS_STYLE)
                 rendered = mark_safe(highlight(path.content, lexer, formatter))
+                content_editable = path.is_writeable()
 
-        if self.context_var is not None:
-            context[self.context_var] = rendered
+        if self.content is not None:
+            context[self.content] = rendered
+            context[self.content_editable] = content_editable
             return u''
 
         return rendered
 
 def do_get_gile_content(parser, token):
     try:
-        tagname, path, unused, context_var = token.split_contents()
+        tagname, path, unused, context_vars = token.split_contents()
+        content, content_editable = map(string.strip, context_vars.split(','))
     except ValueError:
         raise TemplateSyntaxError, \
-              'Usage: {% get_file_content PATH as CONTEXT_VAR %}'
-    return FileContentNode(path, context_var)
+              'Usage: {% get_file_content PATH as CONTEXT_VAR,CONTEXT_VAR %}'
+    return FileContentNode(path, content, content_editable)
 register.tag('get_file_content', do_get_gile_content)
 
 def do_show_file_content(parser, token):
