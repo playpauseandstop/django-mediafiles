@@ -8,7 +8,7 @@ your Django project. Now ``django-mediafiles`` supports:
  * Files creating, uploading +, editing (chmod, chown), deleting +
  * Recycle bin
  * Thumbnail creation for images
- * Text files editing in browser
+ * Text files editing in browser +
 
 **NOTE**: Possibilities that supported current version of
 ``django-mediafiles`` labeled by **+**.
