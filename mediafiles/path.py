@@ -160,6 +160,13 @@ class Path(object):
     def exists(self):
         return os.path.exists(self._abspath)
 
+    def _get_extension(self):
+        if not hasattr(self, '__extension_cache'):
+            unused, extension = os.path.splitext(self._path)
+            setattr(self, '__extension_cache', extension)
+        return getattr(self, '__extension_cache')
+    extension = property(_get_extension)
+
     def _get_files(self):
         return self._get_childs('files')
     files = property(_get_files)

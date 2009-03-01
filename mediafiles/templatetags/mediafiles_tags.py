@@ -2,7 +2,7 @@ import string
 
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
-from pygments.lexers import guess_lexer_for_filename
+from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.util import ClassNotFound
 
 from django.template import Library, Node, TemplateSyntaxError, Variable
@@ -28,20 +28,28 @@ class FileContentNode(Node):
             rendered = render_to_string('mediafiles/wrapper/image.html',
                                         context)
         else:
+            lexer = None
+            lexer_options = {'stripnl': False,
+                             'tabsize': 4}
+
             try:
                 lexer = guess_lexer_for_filename(path.name,
                                                  path.content,
-                                                 stripnl=False,
-                                                 tabsize=4)
+                                                 **lexer_options)
             except ClassNotFound:
-                rendered = None
-            else:
+                if not path.extension and not path.is_executable():
+                    lexer = get_lexer_by_name('text',
+                                              **lexer_options)
+
+            if lexer is not None:
                 formatter = HtmlFormatter(linenos='inline',
                                           lineanchors='l',
                                           nobackground=True,
                                           style=MEDIAFILES_PYGMENTS_STYLE)
                 rendered = mark_safe(highlight(path.content, lexer, formatter))
                 content_editable = path.is_writeable()
+            else:
+                rendered = None
 
         if self.content is not None:
             context[self.content] = rendered
