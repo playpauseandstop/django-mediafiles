@@ -12,6 +12,11 @@ from settings import MEDIAFILES_PYGMENTS_STYLE
 from utils import auto_context
 
 
+def copy(request, path):
+    pass
+copy = staff_member_required(copy)
+copy = path_process(copy)
+
 def edit(request, path):
     context = auto_context(**locals())
 
@@ -61,6 +66,11 @@ explorer = path_process(explorer)
 
 def logout(request):
     return auth_views.logout(request)
+
+def move(request, path):
+    pass
+move = staff_member_required(move)
+move = path_process(move)
 
 def mkdir(request, path):
     context = auto_context(**locals())

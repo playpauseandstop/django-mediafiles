@@ -3,7 +3,7 @@
 {% block title %}: {% if path.is_dir %}{% trans 'Remove directory' %}{% else %}{% trans 'Remove file' %}{% endif %} {{ block.super }}{% endblock %}
 
 {% block page_content %}
-<h1>{% blocktrans with path.safe_path as path %}Remove {{ path }}{% endblocktrans %}</h1>
+<h1>{% blocktrans with path.path as path %}Remove {{ path }}{% endblocktrans %}</h1>
 
 <div id="content-main">
     <form enctype="multipart/form-data" action="" method="post" id="rename_form"><div>

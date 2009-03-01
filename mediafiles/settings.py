@@ -6,7 +6,7 @@ from django.conf import settings
 __all__ = ('DIRNAME', 'MEDIAFILES_DIRS_BLACKLIST', 'MEDIAFILES_EXTS_BLACKLIST',
            'MEDIAFILES_FILES_BLACKLIST', 'MEDIAFILES_IMAGES',
            'MEDIAFILES_MEDIA_PREFIX', 'MEDIAFILES_MEDIA_ROOT',
-           'MEDIAFILES_PYGMENTS_STYLE')
+           'MEDIAFILES_PYGMENTS_STYLE', 'MEDIAFILES_ROOT', 'MEDIAFILES_URL')
 
 # Absolute path to current directory
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
@@ -63,6 +63,14 @@ MEDIAFILES_MEDIA_PREFIX = getattr(settings,
 MEDIAFILES_MEDIA_ROOT = getattr(settings,
                                 'MEDIAFILES_MEDIA_ROOT',
                                 os.path.join(DIRNAME, 'media'))
+
+# Setup this variable manually only if you want to manage files that not
+# placed in your project's ``MEDIA_ROOT`` setting.
+MEDIAFILES_ROOT = getattr(settings, 'MEDIAFILES_ROOT', settings.MEDIA_ROOT)
+
+# Setup this variable manually only if you want to manage files that not
+# placed in your project's ``MEDIA_ROOT`` setting.
+MEDIAFILES_URL = getattr(settings, 'MEDIAFILES_URL', settings.MEDIA_URL)
 
 # **Pygments** settings
 # Name of Pygments style used for code highlighting. You can use one of:

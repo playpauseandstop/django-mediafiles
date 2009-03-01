@@ -3,7 +3,7 @@
 {% block title %}: {% trans 'Make new file' %} {{ block.super }}{% endblock %}
 
 {% block page_content %}
-<h1>{% blocktrans with path.safe_path as path %}Make new file at {{ path }}{% endblocktrans %}</h1>
+<h1>{% blocktrans with path.path as path %}Make new file at {{ path }}{% endblocktrans %}</h1>
 
 <div id="content-main">
     <form enctype="multipart/form-data" action="" method="post" id="mkdir_form"><div>

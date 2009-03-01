@@ -53,7 +53,7 @@ class MakeDirectoryForm(forms.Form):
                   _('Directory\'s name "%s" blacklisted by server settings.' % \
                     name)
 
-        dirs = self.path.list_dir(filter='dirs')
+        dirs = self.path.dirs
         for dir in dirs:
             if dir.name == name:
                 raise forms.ValidationError, \
@@ -104,7 +104,7 @@ class MakeFileForm(forms.Form):
                   _('File\'s extension "%s" blacklisted by server settings.' % \
                     ext)
 
-        files = self.path.list_dir(filter='files')
+        files = self.path.files
         for f in files:
             if f.name == name:
                 raise forms.ValidationError, \
@@ -175,7 +175,7 @@ class RenamePathForm(forms.Form):
 
     def clean_newname(self):
         newname = self.cleaned_data['newname']
-        items = self.path.parent.list_dir()
+        items = self.path.parent.childs
 
         for item in items:
             if item.name == newname:
@@ -228,7 +228,7 @@ class UploadForm(forms.Form):
                   _('File\'s extension "%s" blacklisted by server settings.' % \
                     ext)
 
-        files = self.path.list_dir(filter='files')
+        files = self.path.files
         for f in files:
             if f.name == file.name:
                 setattr(self, '__file_existed', f.name)

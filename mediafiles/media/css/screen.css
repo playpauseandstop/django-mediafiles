@@ -54,7 +54,13 @@ th {
 }
 
 .centerize {
+    width: 100%;
+    max-width: 100%;
     text-align: center;
+}
+
+.centerize img {
+    max-width: 100%;
 }
 
 .form-row input[type="text"] {

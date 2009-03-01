@@ -27,8 +27,15 @@ labeled by **+**.
 Requirements
 ------------
 
-- Pygments_ >= 1.0 needed for source code highlight
+- `django.contrib.auth`_ and `django.contrib.humanize`_ must be added to your
+  project's ``INSTALLED_APPS`` setting;
+- `django.contrib.auth.middleware.AuthMiddleware`_ must exists in your project's
+  ``MIDDLEWARE_CLASSES`` setting;
+- Pygments_ >= 1.0 needed for source code highlight.
 
+.. _`django.contrib.auth`: http://docs.djangoproject.com/en/dev/topics/auth/
+.. _`django.contrib.humanize`: http://docs.djangoproject.com/en/dev/ref/contrib/humanize/
+.. _`django.contrib.auth.middleware.AuthMiddleware`: http://docs.djangoproject.com/en/dev/ref/middleware/#module-django.contrib.auth.middleware
 .. _Pygments: http://www.pygments.org/
 
 Basic installation
@@ -38,17 +45,17 @@ Basic installation
 
     # python setup.py install
 
-or add ``mediafiles`` directory to your ``PYTHONPATH``.
+   or add ``mediafiles`` directory to your ``PYTHONPATH``.
 
 2. Add ``mediafiles`` to your project ``INSTALLED_APPS`` and set up serving
-of ``mediafiles`` media directory.
+   of ``mediafiles`` media directory.
 
 3. Add ``(r'^mediafiles/', include('mediafiles.urls'))`` to your project
-URLConf.
+   URLConf.
 
 4. That's all :) Now login into Django admin CRUD and click on **Media
-Files** (or localized value) link. (Not worked yet, go to mediafiles url
-to get access to it).
+   Files** (or localized value) link. (Not worked yet, go to mediafiles url
+   to get access to it).
 
 More
 ----

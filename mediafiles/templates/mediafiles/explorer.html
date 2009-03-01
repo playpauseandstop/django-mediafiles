@@ -1,7 +1,7 @@
 {% extends 'mediafiles/base.html' %}
 {% load humanize i18n mediafiles_tags %}
 
-{% block title %}{% blocktrans with path.safe_path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans with path.path as path %} at {{ path }}{% endblocktrans %}{% endblock %}
 {% block extra_style %}{% if path.is_file %}
     <link rel="stylesheet" type="text/css" href="{% url mediafiles_pygments_css %}" media="all" />
 {% endif %}{% endblock %}
@@ -12,26 +12,26 @@
     <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a>
 {% else %}
     <a href="{% url mediafiles_explorer "" %}">{% trans 'Home' %}</a> &rsaquo;
-    {% for p in path.parts %}{% if not forloop.last %}
-        <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a> &rsaquo;
+    {% for p in path.parts|slice:"1:" %}{% if not forloop.last %}
+        <a href="{{ p.get_absolute_url }}">{{ p.name }}</a> &rsaquo;
     {% else %}{% if form %}
-        <a href="{{ p.get_absolute_url }}">{{ p.url|cut:"/" }}</a>
+        <a href="{{ p.get_absolute_url }}">{{ p.name }}</a>
     {% else %}
-        {{ p.url|cut:"/" }}
+        {{ p.name }}
     {% endif %}{% endif %}{% endfor %}
 {% endif %}{% endif %}{% endblock breadcrumbs %}
 
 {% block page_content %}
-<h1>{% if path.is_dir %}{% trans 'Directory' %}{% else %}{% trans 'File' %}{% endif %} {{ path.safe_path }}</h1>
+<h1>{% if path.is_dir %}{% trans 'Directory' %}{% else %}{% trans 'File' %}{% endif %} {{ path.path }}</h1>
 
 <div id="content-main">
 
     {% if path.is_file %}{% get_file_content path as content,content_editable %}
     <ul class="object-tools">
-        <li><a href="{{ path.get_media_url }}" class="golink" onclick="this.target='_blank'">{% trans 'Go to' %}</a></li>
-        {% if content_editable %}<li><a href="{{ path.get_edit_url }}" class="changelink">{% trans 'Edit' %}</a></li>{% endif %}
-        <li><a href="{{ path.get_rename_url }}" class="changelink">{% trans 'Rename' %}</a></li>
-        <li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>
+        <li><a href="{{ path.get_direct_url }}" class="golink" onclick="this.target = '_blank'">{% trans 'Go to' %}</a></li>
+        {% if content_editable %}<li><a href="{% url mediafiles_edit path.urlpath %}" class="changelink">{% trans 'Edit' %}</a></li>{% endif %}
+        <li><a href="{% url mediafiles_rename path.urlpath %}" class="changelink">{% trans 'Rename' %}</a></li>
+        <li><a href="{% url mediafiles_remove path.urlpath %}" class="deletelink">{% trans 'Remove' %}</a></li>
     </ul>
 
     <div id="content-main">
@@ -63,18 +63,21 @@
         {% if content %}<div class="module aligned">
             <h2>{% trans 'File content' %}</h2>
             <div class="form-row">{{ content }}</div>
+        </div>{% endif %}
+        <div class="submit-row">{% if content_editable %}
+            <input type="button" value="{% trans 'Edit file' %}" class="default"
+                   onclick="location.href = '{% url mediafiles_edit path.urlpath %}'" />
+        {% endif %}
+            <input type="button" value="{% trans 'Download file' %}"{% if not content_editable %} class="default"{% endif %}
+                   onclick="location.href = '{{ path.get_direct_url }}'" />
         </div>
-        {% if content_editable %}<div class="submit-row">
-            <input type="button" value="{% trans 'Edit this file' %}" class="default"
-                   onclick="location.href = '{{ path.get_edit_url }}'" />
-        </div>{% endif %}{% endif %}
     </div>
     {% else %}{% if path.is_writeable %}
     <ul class="object-tools">
-        <li><a href="{{ path.get_mkdir_url }}" class="addlink">{% trans 'Mkdir' %}</a></li>
-        <li><a href="{{ path.get_mkfile_url }}" class="addlink">{% trans 'Mkfile' %}</a></li>
-        <li><a href="{{ path.get_upload_url }}" class="addlink">{% trans 'Upload' %}</a></li>
-        {% if not path.is_root %}<li><a href="{{ path.get_remove_url }}" class="deletelink">{% trans 'Delete' %}</a></li>{% endif %}
+        <li><a href="{% url mediafiles_mkdir path.urlpath %}" class="addlink">{% trans 'Mkdir' %}</a></li>
+        <li><a href="{% url mediafiles_mkfile path.urlpath %}" class="addlink">{% trans 'Mkfile' %}</a></li>
+        <li><a href="{% url mediafiles_upload path.urlpath %}" class="addlink">{% trans 'Upload' %}</a></li>
+        {% if not path.is_root %}<li><a href="{% url mediafiles_remove path.urlpath %}" class="deletelink">{% trans 'Remove' %}</a></li>{% endif %}
     </ul>{% endif %}
 
     <table id="explorer">
@@ -93,19 +96,19 @@
             <td class="path"><a href="{{ path.get_parent_url }}">..</a></td>
             <td colspan="7"></td>
         </tr>{% endif %}
-        {% for f in path.list_dir %}
+        {% for f in path.childs %}
         <tr class="row{% cycle 1 2 %}" onmouseover="this.className='alt'" onmouseout="this.className='row{% cycle 1 2 %}'">
             <td class="{{ f.get_icon_class }}"></td>
             <td class="{% if f.is_dir %}path{% endif %} pointer" onclick="location.href='{{ f.get_absolute_url }}'" title="{% if f.is_dir %}{% trans 'Open directory page' %}{% else %}{% trans 'Open file page' %}{% endif %}">
-                <a href="{{ f.get_absolute_url }}">{{ f.url }}</a>
+                <a href="{{ f.get_absolute_url }}">{{ f.name }}{% if f.is_dir %}/{% endif %}</a>
             </td>
             <td>{{ f.size|filesizeformat }}</td>
-            <td class="show">{% if f.is_readable %}<a href="{{ f.get_media_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Go to' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
-            <td class="rename"><a href="{{ f.get_rename_url }}">{% trans 'Rename' %}</a></td>
+            <td class="show">{% if f.is_readable %}<a href="{{ f.get_direct_url }}" onclick="this.target='_blank'">{% else %}<span class="disabled">{% endif %}{% trans 'Go to' %}{% if f.is_readable %}</a>{% else %}</span>{% endif %}</td>
+            <td class="rename"><a href="{% url mediafiles_rename f.urlpath %}">{% trans 'Rename' %}</a></td>
             <td class="copy"><span class="disabled">{% trans 'Copy to' %}</span></td>
             <td class="move"><span class="disabled">{% trans 'Move to' %}</span></td>
             <td class="properties"><span class="disabled">{% trans 'Properties' %}</span></td>
-            <td class="delete"><a href="{{ f.get_remove_url }}">{% trans 'Delete' %}</a></td>
+            <td class="delete"><a href="{% url mediafiles_remove f.urlpath %}">{% trans 'Remove' %}</a></td>
         </tr>{% endfor %}
     </table>{% endif %}
 
